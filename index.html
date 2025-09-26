@@ -1,1 +1,673 @@
-# okr-dashboard
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard OKR-KPI Perusahaan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 3px solid #dee2e6;
+        }
+        
+        .nav-tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tab.active {
+            background: #007bff;
+            color: white;
+        }
+        
+        .nav-tab:hover {
+            background: #e9ecef;
+        }
+        
+        .nav-tab.active:hover {
+            background: #0056b3;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .metric-card h3 {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+        
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: white;
+            transition: width 0.3s ease;
+            border-radius: 5px;
+        }
+        
+        .okr-section, .kpi-section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 1.8em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+        }
+        
+        .okr-card, .kpi-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .okr-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .key-results {
+            margin-left: 20px;
+        }
+        
+        .key-result {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #3498db;
+            border-radius: 5px;
+        }
+        
+        .kr-text {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .kr-progress {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .progress-text {
+            font-weight: bold;
+            color: #27ae60;
+            min-width: 60px;
+        }
+        
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        
+        .status-on-track { background: #d4edda; color: #155724; }
+        .status-at-risk { background: #fff3cd; color: #856404; }
+        .status-off-track { background: #f8d7da; color: #721c24; }
+        .status-completed { background: #cce5ff; color: #004085; }
+        
+        .plan-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .plan-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .plan-card h4 {
+            color: #3498db;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .plan-card ul {
+            list-style: none;
+        }
+        
+        .plan-card li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        
+        .plan-card li:last-child {
+            border-bottom: none;
+        }
+        
+        .employee-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .employee-table th {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .employee-table td {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .employee-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #1e7e34;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .plan-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Dashboard OKR-KPI Perusahaan</h1>
+            <p>Sistem Monitoring Plan-Progress-Planning Terintegrasi</p>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('overview')">📈 Overview</button>
+            <button class="nav-tab" onclick="switchTab('okr')">🎯 OKR</button>
+            <button class="nav-tab" onclick="switchTab('kpi')">📊 KPI</button>
+            <button class="nav-tab" onclick="switchTab('employees')">👥 Karyawan</button>
+            <button class="nav-tab" onclick="switchTab('reports')">📋 Laporan</button>
+        </div>
+        
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h3>Total OKR Achievement</h3>
+                    <div class="metric-value">78%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 78%"></div>
+                    </div>
+                </div>
+                
+                <div class="metric-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <h3>KPI Performance</h3>
+                    <div class="metric-value">85%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 85%"></div>
+                    </div>
+                </div>
+                
+                <div class="metric-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                    <h3>Employee Engagement</h3>
+                    <div class="metric-value">92%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 92%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="plan-section">
+                <div class="plan-card">
+                    <h4>📋 PLAN - Target Q4 2024</h4>
+                    <ul>
+                        <li>• Meningkatkan revenue 25%</li>
+                        <li>• Mengurangi churn rate ke 3%</li>
+                        <li>• Implementasi sistem baru</li>
+                        <li>• Training karyawan baru</li>
+                        <li>• Ekspansi pasar regional</li>
+                    </ul>
+                </div>
+                
+                <div class="plan-card">
+                    <h4>⚡ PROGRESS - Status Saat Ini</h4>
+                    <ul>
+                        <li>• Revenue: 78% tercapai</li>
+                        <li>• Churn rate: 4.2% (progress)</li>
+                        <li>• Sistem: 60% implementasi</li>
+                        <li>• Training: 85% selesai</li>
+                        <li>• Ekspansi: fase riset</li>
+                    </ul>
+                </div>
+                
+                <div class="plan-card">
+                    <h4>🚀 PLANNING - Langkah Selanjutnya</h4>
+                    <ul>
+                        <li>• Intensifkan sales campaign</li>
+                        <li>• Evaluasi customer feedback</li>
+                        <li>• Accelerate system deployment</li>
+                        <li>• Complete final training batch</li>
+                        <li>• Market research completion</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- OKR Tab -->
+        <div id="okr" class="tab-content">
+            <div class="section-title">🎯 Objectives & Key Results (OKR)</div>
+            
+            <div class="okr-card">
+                <div class="okr-title">Objective 1: Meningkatkan Pertumbuhan Bisnis</div>
+                <div class="key-results">
+                    <div class="key-result">
+                        <div class="kr-text">KR1: Mencapai revenue 50M pada Q4 2024</div>
+                        <div class="kr-progress">
+                            <div class="progress-bar" style="width: 200px;">
+                                <div class="progress-fill" style="width: 78%; background: #28a745;"></div>
+                            </div>
+                            <span class="progress-text">78%</span>
+                            <span class="status-badge status-on-track">On Track</span>
+                        </div>
+                    </div>
+                    
+                    <div class="key-result">
+                        <div class="kr-text">KR2: Akuisisi 500 customer baru</div>
+                        <div class="kr-progress">
+                            <div class="progress-bar" style="width: 200px;">
+                                <div class="progress-fill" style="width: 65%; background: #ffc107;"></div>
+                            </div>
+                            <span class="progress-text">65%</span>
+                            <span class="status-badge status-at-risk">At Risk</span>
+                        </div>
+                    </div>
+                    
+                    <div class="key-result">
+                        <div class="kr-text">KR3: Mengurangi churn rate menjadi 3%</div>
+                        <div class="kr-progress">
+                            <div class="progress-bar" style="width: 200px;">
+                                <div class="progress-fill" style="width: 45%; background: #dc3545;"></div>
+                            </div>
+                            <span class="progress-text">45%</span>
+                            <span class="status-badge status-off-track">Off Track</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="okr-card">
+                <div class="okr-title">Objective 2: Meningkatkan Operational Excellence</div>
+                <div class="key-results">
+                    <div class="key-result">
+                        <div class="kr-text">KR1: Implementasi sistem ERP baru</div>
+                        <div class="kr-progress">
+                            <div class="progress-bar" style="width: 200px;">
+                                <div class="progress-fill" style="width: 100%; background: #17a2b8;"></div>
+                            </div>
+                            <span class="progress-text">100%</span>
+                            <span class="status-badge status-completed">Completed</span>
+                        </div>
+                    </div>
+                    
+                    <div class="key-result">
+                        <div class="kr-text">KR2: Mengurangi operational cost 15%</div>
+                        <div class="kr-progress">
+                            <div class="progress-bar" style="width: 200px;">
+                                <div class="progress-fill" style="width: 80%; background: #28a745;"></div>
+                            </div>
+                            <span class="progress-text">80%</span>
+                            <span class="status-badge status-on-track">On Track</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- KPI Tab -->
+        <div id="kpi" class="tab-content">
+            <div class="section-title">📊 Key Performance Indicators (KPI)</div>
+            
+            <table class="employee-table">
+                <thead>
+                    <tr>
+                        <th>KPI Category</th>
+                        <th>Metric</th>
+                        <th>Target</th>
+                        <th>Current</th>
+                        <th>Progress</th>
+                        <th>Status</th>
+                        <th>Next Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Financial</strong></td>
+                        <td>Monthly Revenue</td>
+                        <td>4.2M</td>
+                        <td>3.8M</td>
+                        <td>90%</td>
+                        <td><span class="status-badge status-on-track">On Track</span></td>
+                        <td>Push Q4 campaigns</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Customer</strong></td>
+                        <td>Customer Satisfaction</td>
+                        <td>95%</td>
+                        <td>92%</td>
+                        <td>97%</td>
+                        <td><span class="status-badge status-on-track">On Track</span></td>
+                        <td>Continue improvement</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Internal Process</strong></td>
+                        <td>Process Efficiency</td>
+                        <td>85%</td>
+                        <td>78%</td>
+                        <td>92%</td>
+                        <td><span class="status-badge status-at-risk">At Risk</span></td>
+                        <td>Optimize workflows</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Learning & Growth</strong></td>
+                        <td>Employee Training Hours</td>
+                        <td>40h</td>
+                        <td>35h</td>
+                        <td>88%</td>
+                        <td><span class="status-badge status-on-track">On Track</span></td>
+                        <td>Schedule final sessions</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Employees Tab -->
+        <div id="employees" class="tab-content">
+            <div class="section-title">👥 Employee Performance Dashboard</div>
+            
+            <table class="employee-table">
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>Departemen</th>
+                        <th>OKR Progress</th>
+                        <th>KPI Score</th>
+                        <th>Current Focus</th>
+                        <th>Next Milestone</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Andi Pratama</strong></td>
+                        <td>Sales</td>
+                        <td>85%</td>
+                        <td>A</td>
+                        <td>Q4 Revenue Target</td>
+                        <td>Close 15 deals by Nov</td>
+                        <td><span class="status-badge status-on-track">Excellent</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sari Melati</strong></td>
+                        <td>Marketing</td>
+                        <td>78%</td>
+                        <td>B+</td>
+                        <td>Customer Acquisition</td>
+                        <td>Launch new campaign</td>
+                        <td><span class="status-badge status-on-track">Good</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Budi Santoso</strong></td>
+                        <td>Operations</td>
+                        <td>65%</td>
+                        <td>B</td>
+                        <td>Process Optimization</td>
+                        <td>Complete ERP migration</td>
+                        <td><span class="status-badge status-at-risk">Need Support</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lisa Wijaya</strong></td>
+                        <td>HR</td>
+                        <td>92%</td>
+                        <td>A-</td>
+                        <td>Employee Development</td>
+                        <td>Complete training program</td>
+                        <td><span class="status-badge status-completed">Outstanding</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Reports Tab -->
+        <div id="reports" class="tab-content">
+            <div class="section-title">📋 Laporan & Template</div>
+            
+            <div class="plan-section">
+                <div class="plan-card">
+                    <h4>📥 Input Laporan Mingguan</h4>
+                    <p>Form untuk karyawan submit progress mingguan</p>
+                    <div style="margin-top: 15px;">
+                        <button class="btn btn-primary">Buka Form Input</button>
+                    </div>
+                </div>
+                
+                <div class="plan-card">
+                    <h4>📊 Generate Report</h4>
+                    <p>Buat laporan otomatis berdasarkan data terkini</p>
+                    <div style="margin-top: 15px;">
+                        <button class="btn btn-success">Generate PDF</button>
+                    </div>
+                </div>
+                
+                <div class="plan-card">
+                    <h4>📤 Export Data</h4>
+                    <p>Export data ke Excel atau Google Sheets</p>
+                    <div style="margin-top: 15px;">
+                        <button class="btn btn-primary">Export Excel</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="okr-card">
+                <h3>Template Google Forms untuk Input Karyawan:</h3>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 15px;">
+                    <p><strong>Struktur Form yang Direkomendasikan:</strong></p>
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li>Nama Lengkap</li>
+                        <li>Departemen</li>
+                        <li>Periode Laporan (Minggu ke-)</li>
+                        <li>OKR Progress (%)</li>
+                        <li>KPI Achievement (%)</li>
+                        <li>Key Accomplishments (This Week)</li>
+                        <li>Challenges Faced</li>
+                        <li>Next Week Planning</li>
+                        <li>Support Needed</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="alert('Link Google Form: https://forms.gle/[your-form-id]')">📋 Copy Form Template</button>
+                <button class="btn btn-success" onclick="alert('Link Google Sheets: https://sheets.google.com/[your-sheet-id]')">📊 Open Google Sheets</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+        
+        // Auto-refresh progress bars animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 500);
+            });
+        });
+        
+        // Simulate real-time updates (optional)
+        setInterval(function() {
+            const metrics = document.querySelectorAll('.metric-value');
+            metrics.forEach(metric => {
+                // Add subtle animation to show "live" data
+                metric.style.transform = 'scale(1.05)';
+                setTimeout(() => {
+                    metric.style.transform = 'scale(1)';
+                }, 200);
+            });
+        }, 30000); // Every 30 seconds
+    </script>
+</body>
+</html>
